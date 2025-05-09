@@ -1142,9 +1142,18 @@ const struct ppm_event_info g_event_info[] = {
                                {"event_data", PT_UINT64, PF_DEC}}},
         [PPME_SCAPEVENT_X] = {"scapevent", EC_INTERNAL | EC_METAEVENT, EF_UNUSED, 0},
         [PPME_SYSCALL_SETUID_E] =
-                {"setuid", EC_USER | EC_SYSCALL, EF_MODIFIES_STATE, 1, {{"uid", PT_UID, PF_DEC}}},
+                {"setuid",
+                 EC_USER | EC_SYSCALL,
+                 EF_MODIFIES_STATE | EF_TMP_CONVERTER_MANAGED,
+                 1,
+                 {{"uid", PT_UID, PF_DEC}}},
         [PPME_SYSCALL_SETUID_X] =
-                {"setuid", EC_USER | EC_SYSCALL, EF_MODIFIES_STATE, 1, {{"res", PT_ERRNO, PF_DEC}}},
+                {"setuid",
+                 EC_USER | EC_SYSCALL,
+                 EF_MODIFIES_STATE | EF_TMP_CONVERTER_MANAGED,
+                 2,
+                 {{"res", PT_ERRNO, PF_DEC},
+                  {"uid", PT_UID, PF_DEC}}},
         [PPME_SYSCALL_SETGID_E] =
                 {"setgid", EC_USER | EC_SYSCALL, EF_MODIFIES_STATE, 1, {{"gid", PT_GID, PF_DEC}}},
         [PPME_SYSCALL_SETGID_X] =
