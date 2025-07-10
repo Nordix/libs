@@ -104,7 +104,6 @@ void sinsp_parser::process_event(sinsp_evt &evt, sinsp_parser_verdict &verdict) 
 	case PPME_SYSCALL_LINK_E:
 	case PPME_SYSCALL_LINKAT_E:
 	case PPME_SYSCALL_RMDIR_E:
-	case PPME_SYSCALL_PRLIMIT_E:
 	case PPME_SYSCALL_UNLINK_E:
 	case PPME_SYSCALL_UNLINKAT_E:
 	case PPME_SYSCALL_EXECVE_18_E:
@@ -4036,7 +4035,6 @@ void sinsp_parser::parse_getrlimit_setrlimit_exit(sinsp_evt &evt) const {
 
 void sinsp_parser::parse_prlimit_exit(sinsp_evt &evt) const {
 	int64_t retval;
-	sinsp_evt *enter_evt = &m_tmp_evt;
 	uint8_t resource;
 	int64_t newcur;
 	int64_t tid;
@@ -4051,16 +4049,9 @@ void sinsp_parser::parse_prlimit_exit(sinsp_evt &evt) const {
 	//
 	if(retval >= 0) {
 		//
-		// Load the enter event so we can access its arguments
-		//
-		if(!retrieve_enter_event(*enter_evt, evt)) {
-			return;
-		}
-
-		//
 		// Extract the resource number
 		//
-		resource = enter_evt->get_param(1)->as<uint8_t>();
+		resource = evt.get_param(6)->as<uint8_t>();
 
 		if(resource == PPM_RLIMIT_NOFILE) {
 			//
@@ -4072,7 +4063,7 @@ void sinsp_parser::parse_prlimit_exit(sinsp_evt &evt) const {
 				//
 				// Extract the tid and look for its process info
 				//
-				tid = enter_evt->get_param(0)->as<int64_t>();
+				tid = evt.get_param(5)->as<int64_t>();
 
 				if(tid == 0) {
 					tid = evt.get_tid();
