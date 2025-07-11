@@ -3322,6 +3322,21 @@ TEST_F(convert_event_test, PPME_SYSCALL_PTRACE_E_store) {
 	assert_event_storage_presence(evt);
 }
 
+TEST_F(convert_event_test, PPME_SYSCALL_PTRACE_X_0_to_3_params) {
+	constexpr uint64_t ts = 12;
+	constexpr int64_t tid = 25;
+
+	assert_single_conversion_success(CONVERSION_CONTINUE,
+	                                 create_safe_scap_event(ts, tid, PPME_SYSCALL_PTRACE_X, 0),
+	                                 create_safe_scap_event(ts,
+	                                                        tid,
+	                                                        PPME_SYSCALL_PTRACE_X,
+	                                                        3,
+	                                                        0,
+	                                                        scap_const_sized_buffer{nullptr, 0},
+	                                                        scap_const_sized_buffer{nullptr, 0}));
+}
+
 TEST_F(convert_event_test, PPME_SYSCALL_PTRACE_X_to_5_params_no_enter) {
 	constexpr uint64_t ts = 12;
 	constexpr int64_t tid = 25;
