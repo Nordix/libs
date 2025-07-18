@@ -129,7 +129,7 @@ struct {
 	__uint(type, BPF_MAP_TYPE_ARRAY);
 	__uint(max_entries, SYSCALL_TABLE_SIZE);
 	__type(key, uint32_t);
-	__type(value, bool);
+	__type(value, uint8_t);
 } interesting_syscalls_table_64bit __weak SEC(".maps");
 
 /**
