@@ -376,7 +376,7 @@ int pman_fill_interesting_syscalls_table_64bit() {
 	char error_message[MAX_ERROR_MESSAGE_LEN];
 	int fd = bpf_map__fd(g_state.skel->maps.interesting_syscalls_table_64bit);
 	for(uint32_t i = 0; i < SYSCALL_TABLE_SIZE; i++) {
-		const bool interesting = false;
+		const uint8_t interesting = PPM_SC_SUPPORT_NONE;
 		if(bpf_map_update_elem(fd, &i, &interesting, BPF_ANY) < 0) {
 			snprintf(error_message,
 			         MAX_ERROR_MESSAGE_LEN,
@@ -389,7 +389,7 @@ int pman_fill_interesting_syscalls_table_64bit() {
 	return 0;
 }
 
-int pman_mark_single_64bit_syscall(int syscall_id, bool interesting) {
+int pman_mark_single_64bit_syscall(int syscall_id, uint8_t interesting) {
 	char error_message[MAX_ERROR_MESSAGE_LEN];
 	int fd = bpf_map__fd(g_state.skel->maps.interesting_syscalls_table_64bit);
 	if(bpf_map_update_elem(fd, &syscall_id, &interesting, BPF_ANY) < 0) {

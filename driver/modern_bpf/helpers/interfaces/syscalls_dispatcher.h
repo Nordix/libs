@@ -40,8 +40,9 @@ static __always_inline bool syscalls_dispatcher__sampling_logic_enter(uint32_t s
 	return false;
 }
 
-static __always_inline bool syscalls_dispatcher__64bit_interesting_syscall(uint32_t syscall_id) {
-	return maps__interesting_syscall_64bit(syscall_id);
+static __always_inline bool syscalls_dispatcher__64bit_interesting_syscall(uint32_t syscall_id,
+                                                                           bool is_enter) {
+	return maps__interesting_syscall_64bit(syscall_id, is_enter);
 }
 
 static __always_inline long syscalls_dispatcher__convert_socketcall_call_to_syscall_id(

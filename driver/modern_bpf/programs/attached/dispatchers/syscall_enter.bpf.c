@@ -81,7 +81,7 @@ int BPF_PROG(sys_enter, struct pt_regs* regs, long syscall_id) {
 		}
 	}
 
-	if(!syscalls_dispatcher__64bit_interesting_syscall(syscall_id)) {
+	if(!syscalls_dispatcher__64bit_interesting_syscall(syscall_id, true)) {
 		return 0;
 	}
 

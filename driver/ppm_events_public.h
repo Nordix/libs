@@ -2383,4 +2383,13 @@ struct ppm_event_entry {
 #define PPM_FAILURE_FRAME_SCRATCH_MAP_FULL \
 	-5 /* this is used only inside bpf, kernel module does not have a frame scratch map*/
 
+/*
+ * Control syscall filtering per direction.
+ */
+enum ppm_syscall_support {
+	PPM_SC_SUPPORT_NONE = 0,
+	PPM_SC_SUPPORT_ENTER = 1 << 0,
+	PPM_SC_SUPPORT_EXIT = 1 << 1
+};
+
 #endif /* EVENTS_PUBLIC_H_ */

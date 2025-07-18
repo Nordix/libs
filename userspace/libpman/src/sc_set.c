@@ -75,11 +75,29 @@ int pman_enforce_sc_set(bool *sc_set) {
 		}
 
 		if(!sc_set[sc]) {
-			ret = ret ?: pman_mark_single_64bit_syscall(syscall_id, false);
+			ret = ret ?: pman_mark_single_64bit_syscall(syscall_id, PPM_SC_SUPPORT_NONE);
 		} else {
+			/* TODO: add here a better logic to decide for which syscalls
+			 * to disable enter events
+			 */
+
+			/* Default is both enter and exit */
+			uint8_t mode = PPM_SC_SUPPORT_EXIT | PPM_SC_SUPPORT_ENTER;
+
+			/* We only want exit events for specific syscalls */
+			if(false) {
+				char msg[MAX_ERROR_MESSAGE_LEN];
+				snprintf(msg,
+				         MAX_ERROR_MESSAGE_LEN,
+				         "Disabling ENTER for event at index %d (idx:%d)!",
+				         sc,
+				         syscall_id);
+				pman_print_error((const char *)msg);
+				mode = PPM_SC_SUPPORT_EXIT;
+			}
 			sys_enter = true;
 			sys_exit = true;
-			ret = ret ?: pman_mark_single_64bit_syscall(syscall_id, true);
+			ret = ret ?: pman_mark_single_64bit_syscall(syscall_id, mode);
 		}
 	}
 

@@ -529,11 +529,12 @@ int pman_finalize_maps_after_loading(void);
  * @brief Mark a single syscall as (un)interesting
  *
  * @param syscall_id syscall system id.
- * @param interesting true if the syscall must be marked as interesting.
+ * @param interesting PPM_SC_SUPPORT_NONE = 0, PPM_SC_SUPPORT_ENTER = 1,
+ *                    PPM_SC_SUPPORT_EXIT = 2
  *
  * @return `0` on success, `errno` in case of error.
  */
-int pman_mark_single_64bit_syscall(int syscall_id, bool interesting);
+int pman_mark_single_64bit_syscall(int syscall_id, uint8_t interesting);
 
 #ifdef __cplusplus
 }
