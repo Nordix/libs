@@ -148,7 +148,7 @@ int32_t scap_modern_bpf__start_capture(struct scap_engine_handle engine) {
 	 * in our flow, right now in live mode, it should be called only once...
 	 */
 	for(int i = 0; i < SYSCALL_TABLE_SIZE; i++) {
-		pman_mark_single_64bit_syscall(i, false);
+		pman_mark_single_64bit_syscall(i, PPM_SC_SUPPORT_NONE);
 	}
 	handle->capturing = true;
 	return pman_enforce_sc_set(handle->curr_sc_set.ppm_sc);

@@ -144,12 +144,20 @@ static __always_inline uint8_t maps__64bit_sampling_syscall_table(uint32_t sysca
 
 /*=============================== SYSCALL-64 INTERESTING TABLE ===========================*/
 
-static __always_inline bool maps__interesting_syscall_64bit(uint32_t syscall_id) {
-	bool *ret = bpf_map_lookup_elem(&interesting_syscalls_table_64bit, &syscall_id);
+static __always_inline bool maps__interesting_syscall_64bit(uint32_t syscall_id, bool is_enter) {
+	uint8_t *ret = bpf_map_lookup_elem(&interesting_syscalls_table_64bit, &syscall_id);
 	if(ret == NULL) {
 		return false;
 	}
-	return *ret;
+	/*
+	if (is_enter && (*ret & PPM_SC_SUPPORT_ENTER) == 0) {
+	    bpf_printk("Dropping syscall %d enter event, not interesting\n", syscall_id);
+	    return false;
+	}
+	*/
+
+	return (is_enter && (*ret & PPM_SC_SUPPORT_ENTER)) ||
+	       (!is_enter && (*ret & PPM_SC_SUPPORT_EXIT));
 }
 
 /*=============================== SYSCALL-64 INTERESTING TABLE ===========================*/
