@@ -122,6 +122,15 @@ struct {
 /*=============================== BPF_MAP_TYPE_ARRAY ===============================*/
 
 /**
+ * @brief Control syscall filtering per direction.
+ */
+enum ppm_syscall_support {
+	PPM_SC_SUPPORT_NONE = 0,
+	PPM_SC_SUPPORT_ENTER = 1 << 1,
+	PPM_SC_SUPPORT_EXIT = 1 << 2
+};
+
+/**
  * @brief This table is used to keep track of which syscalls must be filtered out
  * according to the simple consumer logic.
  */
@@ -129,7 +138,7 @@ struct {
 	__uint(type, BPF_MAP_TYPE_ARRAY);
 	__uint(max_entries, SYSCALL_TABLE_SIZE);
 	__type(key, uint32_t);
-	__type(value, bool);
+	__type(value, uint8_t);
 } interesting_syscalls_table_64bit __weak SEC(".maps");
 
 /**

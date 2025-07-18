@@ -52,11 +52,50 @@ int pman_enforce_sc_set(bool *sc_set) {
 		}
 
 		if(!sc_set[sc]) {
-			ret = ret ?: pman_mark_single_64bit_syscall(syscall_id, false);
+			ret = ret ?: pman_mark_single_64bit_syscall(syscall_id, 0);
 		} else {
+			/* TODO: add here a better logic to decide for which syscalls
+			 * to disable enter events
+			 */
+
+			/* Default is both enter and exit */
+			uint8_t mode = PPM_SC_SUPPORT_EXIT & PPM_SC_SUPPORT_ENTER;
+
+			/* We only want exit events for specific syscalls */
+			if(sc == PPM_SC_ACCEPT4 || sc == PPM_SC_ACCEPT || sc == PPM_SC_BIND ||
+			   /* sc == PPM_SC_CONNECT || */
+			   sc == PPM_SC_GETSOCKOPT || sc == PPM_SC_LISTEN || sc == PPM_SC_SOCKET ||
+			   sc == PPM_SC_CAPSET || sc == PPM_SC_CHDIR || sc == PPM_SC_CHMOD ||
+			   sc == PPM_SC_CHROOT || sc == PPM_SC_CLONE || sc == PPM_SC_CLONE3 ||
+			   sc == PPM_SC_CLOSE ||
+			   /* sc == PPM_SC_CREAT || */
+			   sc == PPM_SC_DUP || sc == PPM_SC_DUP2 || sc == PPM_SC_DUP3 ||
+			   /* sc == PPM_SC_EXECVE || */
+			   /* sc == PPM_SC_EXECVEAT || */
+			   sc == PPM_SC_FCHDIR || sc == PPM_SC_FCHMOD || sc == PPM_SC_FCHMODAT ||
+			   sc == PPM_SC_FORK || sc == PPM_SC_LINK || sc == PPM_SC_LINKAT ||
+			   sc == PPM_SC_MKDIR || sc == PPM_SC_MKDIRAT ||
+			   /* sc == PPM_SC_OPEN || */
+			   /* sc == PPM_SC_OPENAT || */
+			   /* sc == PPM_SC_OPENAT2 || */
+			   sc == PPM_SC_PRCTL || sc == PPM_SC_PTRACE || sc == PPM_SC_RENAME ||
+			   sc == PPM_SC_RENAMEAT || sc == PPM_SC_RMDIR || sc == PPM_SC_SETGID ||
+			   sc == PPM_SC_SETNS || sc == PPM_SC_SETPGID || sc == PPM_SC_SETRESGID ||
+			   sc == PPM_SC_SETSID || sc == PPM_SC_SYMLINK || sc == PPM_SC_SYMLINKAT ||
+			   sc == PPM_SC_SETRESUID || sc == PPM_SC_SETUID || sc == PPM_SC_UNLINK ||
+			   sc == PPM_SC_UNLINKAT || sc == PPM_SC_USERFAULTFD || sc == PPM_SC_VFORK) {
+				char msg[MAX_ERROR_MESSAGE_LEN];
+				snprintf(msg,
+				         MAX_ERROR_MESSAGE_LEN,
+				         "Disabling ENTER for event at index %d (idx:%d)!",
+				         sc,
+				         syscall_id);
+				pman_print_error((const char *)error_message);
+				mode = PPM_SC_SUPPORT_EXIT;
+			}
 			sys_enter = true;
 			sys_exit = true;
-			ret = ret ?: pman_mark_single_64bit_syscall(syscall_id, true);
+			ret = ret ?: pman_mark_single_64bit_syscall(syscall_id, mode);
 		}
 	}
 
