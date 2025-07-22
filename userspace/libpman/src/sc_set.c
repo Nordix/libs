@@ -89,7 +89,7 @@ int pman_enforce_sc_set(bool *sc_set) {
 				char msg[MAX_ERROR_MESSAGE_LEN];
 				snprintf(msg,
 				         MAX_ERROR_MESSAGE_LEN,
-				         "Disabling ENTER for event at index %d (idx:%d)!",
+				         "Disabling ENTER for event at index %d (idx:%d)!\n",
 				         sc,
 				         syscall_id);
 				pman_print_error((const char *)msg);
