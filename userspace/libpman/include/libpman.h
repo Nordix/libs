@@ -55,12 +55,16 @@ struct scap_stats;
  * @param buf_bytes_dim dimension of a single per-CPU buffer in bytes.
  * @param cpus_for_each_buffer number of CPUs to which we want to associate a ring buffer.
  * @param allocate_online_only if true, allocate ring buffers taking only into account online CPUs.
+ * @param disable_entry_events if true, disable entry events.
+ * @param disable_tocttou if true, disable TOCTTOU support.
  * @return `0` on success, `-1` in case of error.
  */
 int pman_init_state(falcosecurity_log_fn log_fn,
                     unsigned long buf_bytes_dim,
                     uint16_t cpus_for_each_buffer,
-                    bool allocate_online_only);
+                    bool allocate_online_only,
+                    bool disable_entry_events,
+                    bool disable_tocttou);
 
 /**
  * @brief Clear the `libpman` global state before it is used.

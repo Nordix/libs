@@ -77,6 +77,8 @@ void pman_clear_state() {
 	g_state.buffer_bytes_dim = 0;
 	g_state.last_ring_read = -1;
 	g_state.last_event_size = 0;
+	g_state.disable_entry_events = false;
+	g_state.disable_tocttou = false;
 
 	for(int j = 0; j < MODERN_BPF_PROG_ATTACHED_MAX; j++) {
 		g_state.attached_progs_fds[j] = -1;
@@ -95,7 +97,9 @@ void pman_clear_state() {
 int pman_init_state(falcosecurity_log_fn log_fn,
                     unsigned long buf_bytes_dim,
                     uint16_t cpus_for_each_buffer,
-                    bool allocate_online_only) {
+                    bool allocate_online_only,
+                    bool disable_entry_events,
+                    bool disable_tocttou) {
 	char error_message[MAX_ERROR_MESSAGE_LEN];
 
 	/* `LIBBPF_STRICT_ALL` turns on all supported strict features
@@ -181,6 +185,10 @@ int pman_init_state(falcosecurity_log_fn log_fn,
 	}
 	/* Set the dimension of a single ring buffer */
 	g_state.buffer_bytes_dim = buf_bytes_dim;
+
+	/* Entry event configuration. */
+	g_state.disable_entry_events = disable_entry_events;
+	g_state.disable_tocttou = disable_tocttou;
 
 	/* These will be used during the ring buffer consumption phase. */
 	g_state.last_ring_read = -1;

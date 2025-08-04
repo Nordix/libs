@@ -77,15 +77,21 @@ int pman_enforce_sc_set(bool *sc_set) {
 		if(!sc_set[sc]) {
 			ret = ret ?: pman_mark_single_64bit_syscall(syscall_id, PPM_SC_SUPPORT_NONE);
 		} else {
-			/* TODO: add here a better logic to decide for which syscalls
-			 * to disable enter events
-			 */
-
 			/* Default is both enter and exit */
 			uint8_t mode = PPM_SC_SUPPORT_EXIT | PPM_SC_SUPPORT_ENTER;
 
-			/* We only want exit events for specific syscalls */
-			if(false) {
+			/* If we disable entry events, we only want exit events */
+			if(g_state.disable_entry_events) {
+				/* We only want exit events if TOCTTOU is disabled or if
+				 * the syscall is not a TOCTTOU syscall
+				 */
+				if(!g_state.disable_tocttou || sc != PPM_SC_CONNECT || sc != PPM_SC_CREAT ||
+				   sc != PPM_SC_OPEN || sc != PPM_SC_OPENAT || sc != PPM_SC_OPENAT2) {
+					mode = PPM_SC_SUPPORT_EXIT;
+				}
+			}
+
+			if(mode == PPM_SC_SUPPORT_EXIT) {
 				char msg[MAX_ERROR_MESSAGE_LEN];
 				snprintf(msg,
 				         MAX_ERROR_MESSAGE_LEN,
@@ -93,7 +99,6 @@ int pman_enforce_sc_set(bool *sc_set) {
 				         sc,
 				         syscall_id);
 				pman_print_error((const char *)msg);
-				mode = PPM_SC_SUPPORT_EXIT;
 			}
 			sys_enter = true;
 			sys_exit = true;
