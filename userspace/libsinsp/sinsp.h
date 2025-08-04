@@ -160,10 +160,24 @@ public:
 	 * ring buffer. The last one allows allocating ring buffers only for online CPUs and not for all
 	 * system-available CPUs.
 	 */
-	virtual void open_modern_bpf(
+	void open_modern_bpf(unsigned long driver_buffer_bytes_dim = DEFAULT_DRIVER_BUFFER_BYTES_DIM,
+	                     uint16_t cpus_for_each_buffer = DEFAULT_CPU_FOR_EACH_BUFFER,
+	                     bool online_only = true,
+	                     const libsinsp::events::set<ppm_sc_code>& ppm_sc_of_interest = {}) {
+		open_modern_bpf_real(driver_buffer_bytes_dim,
+		                     cpus_for_each_buffer,
+		                     online_only,
+		                     true,
+		                     true,
+		                     ppm_sc_of_interest);
+	}
+
+	virtual void open_modern_bpf_direct(
 	        unsigned long driver_buffer_bytes_dim = DEFAULT_DRIVER_BUFFER_BYTES_DIM,
 	        uint16_t cpus_for_each_buffer = DEFAULT_CPU_FOR_EACH_BUFFER,
 	        bool online_only = true,
+	        bool disable_entry_events = false,
+	        bool disable_tocttou = false,
 	        const libsinsp::events::set<ppm_sc_code>& ppm_sc_of_interest = {});
 	virtual void open_test_input(scap_test_input_data* data, sinsp_mode_t mode = SINSP_MODE_TEST);
 

@@ -254,7 +254,9 @@ int32_t scap_modern_bpf__init(scap_t* handle, scap_open_args* oargs) {
 	if(pman_init_state(oargs->log_fn,
 	                   params->buffer_bytes_dim,
 	                   params->cpus_for_each_buffer,
-	                   params->allocate_online_only)) {
+	                   params->allocate_online_only,
+	                   params->disable_entry_events,
+	                   params->disable_tocttou) != SCAP_SUCCESS) {
 		return scap_errprintf(handle->m_lasterr, 0, "unable to configure the libpman state.");
 	}
 
