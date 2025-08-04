@@ -758,10 +758,12 @@ void sinsp::open_gvisor(const std::string& config_path,
 #endif
 }
 
-void sinsp::open_modern_bpf(unsigned long driver_buffer_bytes_dim,
-                            uint16_t cpus_for_each_buffer,
-                            bool online_only,
-                            const libsinsp::events::set<ppm_sc_code>& ppm_sc_of_interest) {
+void sinsp::open_modern_bpf_direct(unsigned long driver_buffer_bytes_dim,
+                                   uint16_t cpus_for_each_buffer,
+                                   bool online_only,
+                                   bool disable_entry_events,
+                                   bool disable_tocttou,
+                                   const libsinsp::events::set<ppm_sc_code>& ppm_sc_of_interest) {
 #ifdef HAS_ENGINE_MODERN_BPF
 	scap_open_args oargs{};
 
@@ -773,6 +775,8 @@ void sinsp::open_modern_bpf(unsigned long driver_buffer_bytes_dim,
 	params.buffer_bytes_dim = driver_buffer_bytes_dim;
 	params.cpus_for_each_buffer = cpus_for_each_buffer;
 	params.allocate_online_only = online_only;
+	params.disable_entry_events = disable_entry_events;
+	params.disable_tocttou = disable_tocttou;
 	oargs.engine_params = &params;
 
 	scap_platform* platform = scap_linux_alloc_platform({::on_proc_table_refresh_start,
