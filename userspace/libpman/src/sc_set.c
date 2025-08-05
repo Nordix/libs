@@ -85,20 +85,20 @@ int pman_enforce_sc_set(bool *sc_set) {
 				/* We only want exit events if TOCTTOU is disabled or if
 				 * the syscall is not a TOCTTOU syscall
 				 */
-				if(!g_state.disable_tocttou || sc != PPM_SC_CONNECT || sc != PPM_SC_CREAT ||
-				   sc != PPM_SC_OPEN || sc != PPM_SC_OPENAT || sc != PPM_SC_OPENAT2) {
+				if(!g_state.disable_tocttou ||
+				   (sc != PPM_SC_CONNECT && sc != PPM_SC_CREAT && sc != PPM_SC_OPEN &&
+				    sc != PPM_SC_OPENAT && sc != PPM_SC_OPENAT2)) {
+					char msg[MAX_ERROR_MESSAGE_LEN];
+					snprintf(msg,
+					         MAX_ERROR_MESSAGE_LEN,
+					         "Disabling ENTER for event %s(%d)[idx:%d]!\n",
+					         scap_get_ppm_sc_name(sc),
+					         sc,
+					         syscall_id);
+					errno = 0;  // Reset errno to avoid confusion
+					pman_print_error((const char *)msg);
 					mode = PPM_SC_SUPPORT_EXIT;
 				}
-			}
-
-			if(mode == PPM_SC_SUPPORT_EXIT) {
-				char msg[MAX_ERROR_MESSAGE_LEN];
-				snprintf(msg,
-				         MAX_ERROR_MESSAGE_LEN,
-				         "Disabling ENTER for event at index %d (idx:%d)!\n",
-				         sc,
-				         syscall_id);
-				pman_print_error((const char *)msg);
 			}
 			sys_enter = true;
 			sys_exit = true;
