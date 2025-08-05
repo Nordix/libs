@@ -164,15 +164,15 @@ public:
 	                     uint16_t cpus_for_each_buffer = DEFAULT_CPU_FOR_EACH_BUFFER,
 	                     bool online_only = true,
 	                     const libsinsp::events::set<ppm_sc_code>& ppm_sc_of_interest = {}) {
-		open_modern_bpf_real(driver_buffer_bytes_dim,
-		                     cpus_for_each_buffer,
-		                     online_only,
-		                     true,
-		                     true,
-		                     ppm_sc_of_interest);
+		_open_modern_bpf(driver_buffer_bytes_dim,
+		                 cpus_for_each_buffer,
+		                 online_only,
+		                 false,  // disable_entry_events
+		                 false,  // disable_tocttou
+		                 ppm_sc_of_interest);
 	}
 
-	virtual void open_modern_bpf_direct(
+	virtual void _open_modern_bpf(
 	        unsigned long driver_buffer_bytes_dim = DEFAULT_DRIVER_BUFFER_BYTES_DIM,
 	        uint16_t cpus_for_each_buffer = DEFAULT_CPU_FOR_EACH_BUFFER,
 	        bool online_only = true,
