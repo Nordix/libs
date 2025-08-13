@@ -82,23 +82,16 @@ int pman_enforce_sc_set(bool *sc_set) {
 
 			/* If we disable entry events, we only want exit events */
 			if(g_state.disable_entry_events) {
-				/* We only want exit events if TOCTTOU is disabled or if
-				 * the syscall is not a TOCTTOU syscall
-				 */
-				if(!g_state.disable_tocttou ||
-				   (sc != PPM_SC_CONNECT && sc != PPM_SC_CREAT && sc != PPM_SC_OPEN &&
-				    sc != PPM_SC_OPENAT && sc != PPM_SC_OPENAT2)) {
-					char msg[MAX_ERROR_MESSAGE_LEN];
-					snprintf(msg,
-					         MAX_ERROR_MESSAGE_LEN,
-					         "Disabling ENTER for event %s(%d)[idx:%d]!\n",
-					         scap_get_ppm_sc_name(sc),
-					         sc,
-					         syscall_id);
-					errno = 0;  // Reset errno to avoid confusion
-					pman_print_error((const char *)msg);
-					mode = PPM_SC_SUPPORT_EXIT;
-				}
+				char msg[MAX_ERROR_MESSAGE_LEN];
+				snprintf(msg,
+				         MAX_ERROR_MESSAGE_LEN,
+				         "Disabling ENTER for event %s(%d)[idx:%d]!\n",
+				         scap_get_ppm_sc_name(sc),
+				         sc,
+				         syscall_id);
+				errno = 0;  // Reset errno to avoid confusion
+				pman_print_error((const char *)msg);
+				mode = PPM_SC_SUPPORT_EXIT;
 			}
 			sys_enter = true;
 			sys_exit = true;
@@ -148,44 +141,49 @@ int pman_enforce_sc_set(bool *sc_set) {
 	 * not defined on ARM64): in this case, simply ignore the returned ENOENT error and log
 	 * something, as we don't have any other way to deal with it.
 	 */
-	if(attach_connect_ttm_progs)
-		ret = ret
+	if (!g_state.disable_tocttou) {
+		if(attach_connect_ttm_progs)
+			ret = ret
 		              ?: ignore_and_log_enoent("connect_ttm",
 		                                       pman_attach_connect_toctou_mitigation_progs());
-	else
-		ret = ret ?: pman_detach_connect_toctou_mitigation_progs();
+		else
+			ret = ret ?: pman_detach_connect_toctou_mitigation_progs();
 
-	if(attach_creat_ttm_progs)
-		ret = ret
+		if(attach_creat_ttm_progs)
+			ret = ret
 		              ?: ignore_and_log_enoent("creat_ttm",
 		                                       pman_attach_creat_toctou_mitigation_progs());
-	else
-		ret = ret ?: pman_detach_creat_toctou_mitigation_progs();
+		else
+			ret = ret ?: pman_detach_creat_toctou_mitigation_progs();
 
-	if(attach_open_ttm_progs)
-		ret = ret ?: ignore_and_log_enoent("open_ttm", pman_attach_open_toctou_mitigation_progs());
-	else
-		ret = ret ?: pman_detach_open_toctou_mitigation_progs();
+		if(attach_open_ttm_progs)
+			ret = ret ?: ignore_and_log_enoent("open_ttm", pman_attach_open_toctou_mitigation_progs());
+		else
+			ret = ret ?: pman_detach_open_toctou_mitigation_progs();
 
-	if(attach_openat2_ttm_progs)
-		ret = ret
+		if(attach_openat2_ttm_progs)
+			ret = ret
 		              ?: ignore_and_log_enoent("openat2_ttm",
 		                                       pman_attach_openat2_toctou_mitigation_progs());
-	else
-		ret = ret ?: pman_detach_openat2_toctou_mitigation_progs();
+		else
+			ret = ret ?: pman_detach_openat2_toctou_mitigation_progs();
 
-	if(attach_openat_ttm_progs)
-		ret = ret
+		if(attach_openat_ttm_progs)
+			ret = ret
 		              ?: ignore_and_log_enoent("openat_ttm",
 		                                       pman_attach_openat_toctou_mitigation_progs());
-	else
-		ret = ret ?: pman_detach_openat_toctou_mitigation_progs();
+		else
+			ret = ret ?: pman_detach_openat_toctou_mitigation_progs();
+	}
 
-	/* sys_enter and sys_exit dispatchers section. */
-	if(sys_enter)
-		ret = ret ?: pman_attach_syscall_enter_dispatcher();
-	else
-		ret = ret ?: pman_detach_syscall_enter_dispatcher();
+	/* Enable desired tracepoints */
+	if(!g_state.disable_entry_events) {
+		/* Only if entry events are required */
+		if(sys_enter)
+			ret = ret ?: pman_attach_syscall_enter_dispatcher();
+		else
+			ret = ret ?: pman_detach_syscall_enter_dispatcher();
+	}
 
 	if(sys_exit)
 		ret = ret ?: pman_attach_syscall_exit_dispatcher();
