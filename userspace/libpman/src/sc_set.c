@@ -62,7 +62,7 @@ int pman_enforce_sc_set(bool *sc_set) {
 				/* We only want exit events if TOCTTOU is disabled or if
 				 * the syscall is not a TOCTTOU syscall
 				 */
-				if(!g_state.disable_tocttou ||
+				if(g_state.disable_tocttou ||
 				   (sc != PPM_SC_CONNECT && sc != PPM_SC_CREAT && sc != PPM_SC_OPEN &&
 				    sc != PPM_SC_OPENAT && sc != PPM_SC_OPENAT2)) {
 					char msg[MAX_ERROR_MESSAGE_LEN];
@@ -93,10 +93,13 @@ int pman_enforce_sc_set(bool *sc_set) {
 	}
 
 	/* Enable desired tracepoints */
-	if(sys_enter)
-		ret = ret ?: pman_attach_syscall_enter_dispatcher();
-	else
-		ret = ret ?: pman_detach_syscall_enter_dispatcher();
+	if(!g_state.disable_entry_events || !g_state.disable_tocttou) {
+		/* Only if entry events are required */
+		if(sys_enter)
+			ret = ret ?: pman_attach_syscall_enter_dispatcher();
+		else
+			ret = ret ?: pman_detach_syscall_enter_dispatcher();
+	}
 
 	if(sys_exit)
 		ret = ret ?: pman_attach_syscall_exit_dispatcher();
